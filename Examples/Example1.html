@@ -1,0 +1,171 @@
+<p>
+	Click on a country to open its Wikipedia page
+</p>
+
+<div style="position: relative; height: 500px; left: 20px;">
+	<!-- Implementing canvas as separate layers in HTML -->
+	<canvas id="layer1" style="position: absolute; left: 0; top: 0; z-index: 0;" width="500" height="500"></canvas>
+	<canvas id="layer2" style="position: absolute; left: 0; top: 0; z-index: 1;" width="500" height="500"></canvas>
+	<canvas id="layer3" style="position: absolute; left: 0; top: 0; z-index: 2;" width="500" height="500"></canvas>
+</div>
+
+<script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.7.1.min.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+			  /* 
+			  *     Example of clickable elements using HTML5 canvas elements
+			  *     Works well for small number of clickable elements with certain area
+			  *     Based on the following examples:
+			  *		http://javascript-html5-tutorial.com/html5-tutorial-a-photo-on-the-canvas-with-clickable-elements.html
+			  *		http://www.html5canvastutorials.com/advanced/html5-canvas-mouse-coordinates/
+			  */
+			  
+			  
+			  //Declaration and initiation of variables
+			  var defaultWidth  = 500,
+			      defaultHeight = 500,
+				  
+				  canvas  = document.getElementById('layer1'),  //for Layer 1
+				  canvas2 = document.getElementById('layer2'),  //for Layer 2
+				  canvas3 = document.getElementById('layer3'),  //for Layer 3
+				  
+				  context  = canvas.getContext('2d'),  //for Layer 1
+				  context2 = canvas2.getContext('2d'), //for Layer 2
+				  context3 = canvas3.getContext('2d'), //for Layer 3
+				  imageObj = new Image(),
+				  
+				  //Links where user is redirected once clicking on a given country circle area
+				  dataRedirectLinks = {
+					0:	'https://en.wikipedia.org/wiki/Norway',
+					1:	'https://en.wikipedia.org/wiki/Sweden',
+					2:	'https://en.wikipedia.org/wiki/Finland',
+					3:	'https://en.wikipedia.org/wiki/Estonia/',
+					4:	'https://en.wikipedia.org/wiki/Latvia/',
+					5:	'https://en.wikipedia.org/wiki/Lithuania/',
+					6:	'https://en.wikipedia.org/wiki/Poland',
+					7:	'https://en.wikipedia.org/wiki/Germany/',
+					8:	'https://en.wikipedia.org/wiki/Denmark/'
+				   },
+				   
+				   //Country 'circles' list
+				   circles = [],
+				   
+				   //counter-increment for 'for' cycles
+				   i,
+				   
+				   //increasing 'clickable' area around circles relative to map dimensions
+				   offset = defaultWidth * 0.035;
+				   
+			  
+			  //Drawing Layer 1 canvas (the background layer with a map image)
+			  canvas.width  = defaultWidth;
+			  canvas.height = defaultHeight;
+			  
+			  imageObj.onload = function() {
+					context.drawImage(imageObj, 0, 0);
+			  };
+			  imageObj.src = 'http://www.socialenterprisebsr.net/wp-content/uploads/2016/01/BalticSeaRegionMap500x500.gif';
+			  
+			  //Drawing Layer 2 canvas (the default country points)
+			  canvas2.width  = defaultWidth;
+			  canvas2.height = defaultHeight;			  	
+			  
+			  //Circle object area and coordinates location relative to the map dimensions as x, y
+			  var theCircle = function(x, y, radius) {
+				  this.left = x - radius;
+				  this.top = y - radius;
+				  this.right = x + radius;
+				  this.bottom = y + radius;
+				  this.x = x;
+				  this.y = y;
+				};	
+				
+				//Function to draw a circle in a particular style and with a label
+				var drawCircle = function (context, x, y, fillcolor, radius, linewidth, strokestyle, fontcolor, textalign, fonttype, filltext) {
+					context.beginPath();
+					context.arc(x, y, radius, 0, 2 * Math.PI, false);
+					context.fillStyle = fillcolor;
+					context.fill();
+					context.lineWidth = linewidth;
+					context.strokeStyle = strokestyle;
+					context.stroke();
+					context.fillStyle = fontcolor;
+					context.font = fonttype;
+					context.textAlign = textalign;
+					//Making sure label does not overlap the circle depending whether it is on the right or on the left
+					if (textalign == "right")
+						context.fillText(filltext, x+(offset/2), y-offset);
+					if (textalign == "left")
+						context.fillText(filltext, x+offset, y);
+				};
+				
+				//Function to draw a circle and add it to the circles list
+				var drawCircles = function (context, x, y, fillcolor, radius, linewidth, strokestyle, fontcolor, textalign, fonttype, filltext, circles) {
+					drawCircle(context, x, y, fillcolor, radius, linewidth, strokestyle, fontcolor, textalign, fonttype, filltext);
+					var circle = new theCircle(x, y, radius);
+					circles.push(circle);
+				};
+			    
+			//Drawing circles and adding them to the circles list, calculation of x,y coordinates is based on relative location of the map default height and width
+			//Function parameters: context, x, y, fillcolor, radius, linewidth, strokestyle, fontcolor, textalign, fonttype, filltext, circles
+			drawCircles(context2, canvas2.width*0.32, canvas2.height*0.54, "rgba(0, 0, 102, 0.2)", canvas2.width*0.02, 1, "#ccccff", "#000033", "right", "bold 16px 'Raleway'", "Norway", circles);
+			drawCircles(context2, canvas2.width*0.47, canvas2.height*0.50, "rgba(0, 0, 102, 0.2)", canvas2.width*0.02, 1, "#ccccff", "#000033", "right" ,"", "Sweden", circles);
+			drawCircles(context2, canvas2.width*0.70, canvas2.height*0.45, "rgba(0, 0, 102, 0.2)", canvas2.width*0.02, 1, "#ccccff", "#000033", "right" ,"", "Finland", circles);
+			drawCircles(context2, canvas2.width*0.71, canvas2.height*0.62, "rgba(0, 0, 102, 0.2)", canvas2.width*0.02, 1, "#ccccff", "#000033", "left"  ,"", "Estonia", circles);
+			drawCircles(context2, canvas2.width*0.69, canvas2.height*0.71, "rgba(0, 0, 102, 0.2)", canvas2.width*0.02, 1, "#ccccff", "#000033", "left"  ,"", "Latvia", circles);
+			drawCircles(context2, canvas2.width*0.66, canvas2.height*0.78, "rgba(0, 0, 102, 0.2)", canvas2.width*0.02, 1, "#ccccff", "#000033", "left"  ,"", "Lithuania", circles);
+			drawCircles(context2, canvas2.width*0.52, canvas2.height*0.88, "rgba(0, 0, 102, 0.2)", canvas2.width*0.02, 1, "#ccccff", "#000033", "left"  ,"", "Poland", circles);
+			drawCircles(context2, canvas2.width*0.30, canvas2.height*0.88, "rgba(0, 0, 102, 0.2)", canvas2.width*0.02, 1, "#ccccff", "#000033", "right" ,"", "Germany", circles);
+			drawCircles(context2, canvas2.width*0.27, canvas2.height*0.72, "rgba(0, 0, 102, 0.2)", canvas2.width*0.02, 1, "#ccccff", "#000033", "right" ,"", "Denmark", circles);
+		  
+		    //Drawing Layer 3 canvas (for tracking mouse movements and changing circle colors by drawing new circles in Layer 3)
+			canvas3.width  = defaultWidth;
+			canvas3.height = defaultHeight;		
+			  
+			//Function to get mouse position relative to given canvas
+			function getMousePos (canvas, e) {
+				var rect = canvas.getBoundingClientRect();
+				return {
+				  x: e.clientX - rect.left,
+				  y: e.clientY - rect.top
+				};
+			  }			
+            
+			//Capturing click event and redirecting
+			$('#layer3').click( function (e) {
+				var rect = canvas3.getBoundingClientRect();
+				var clickedX = e.clientX - rect.left;
+				var clickedY = e.clientY - rect.top;
+                var offset = defaultWidth * 0.035;
+                for ( i = 0; i < circles.length; i++ ) {
+                    if ( clickedX < circles[i].right + offset ) 
+					    if ( clickedX > circles[i].left - offset ) 
+                            if ( clickedY > circles[i].top - offset ) 
+                               if ( clickedY < circles[i].bottom + offset ) {
+                                    window.location = dataRedirectLinks[i];
+                               }
+                }
+            });	
+			
+			//Capturing mouse movement and drawing 'active' circle in case mouse is within 'clickable' area
+			canvas3.addEventListener('mousemove', function (e) {
+				var mousePos = getMousePos(canvas3, e);
+				
+				//Clearing canvas before checking if mouse hovers the required region
+				context3.clearRect(0, 0, canvas3.width, canvas3.height);
+				document.getElementById('layer3').style.cursor = "auto";
+				
+				//Checking if mouse hovers any of the circle regions from Layer 2
+				for ( i = 0; i < circles.length; i++ ) {
+                    if ( mousePos.x < circles[i].right + offset ) 
+					     if ( mousePos.x > circles[i].left - offset)
+                              if ( mousePos.y > circles[i].top - offset )
+                                   if ( mousePos.y < circles[i].bottom + offset ) {
+						                //if mouse is over the 'clickable' circle area - changing the cursor to pointer and drawing over a new circle with different color
+										document.getElementById('layer3').style.cursor = "pointer";
+						                drawCircle(context3, circles[i].x, circles[i].y, "rgba(235, 134, 0, 0.9)", canvas3.width*0.02, 1.5, "#EBD600", "#000033", "right", "", "");
+                                   }
+                }
+			  }, false);			  
+         
+</script>
